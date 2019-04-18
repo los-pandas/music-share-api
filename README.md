@@ -54,7 +54,7 @@ rake spec
 		```json
 		{
 		    "title": "new playlist",
-		    "description": 'test playlist',
+		    "description": "test playlist",
 		    "image_url":"www.test.test",
 		    "creator": "Xavier",
 		    "is_private": True
@@ -65,6 +65,6 @@ rake spec
 		```json
 		{
 		    "playlist_id": 1,
-		    "song_id": '3'
+		    "song_id": 3
 		}
 		```
