@@ -57,7 +57,7 @@ rake spec
 		    "description": "test playlist",
 		    "image_url":"www.test.test",
 		    "creator": "Xavier",
-		    "is_private": True
+		    "is_private": true
 		}
 		```
 - Post 'api/v1/song-playlist': adds a song to a playlist, returns 400 in case the playlist_id or song_id is not found
