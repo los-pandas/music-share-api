@@ -1,0 +1,13 @@
+---
+- title: 'I See Fire'
+  duration_seconds: 300
+  image_url: 'www.test.test'
+  artists: 'Ed Sheeran'
+- title: 'Everlong'
+  duration_seconds: 200
+  image_url: 'www.test.test2'
+  artists: 'Foo Fighters'
+- title: 'Rap God'
+  duration_seconds: 600
+  image_url: 'www.test.test2'
+  artists: 'Eminem'
