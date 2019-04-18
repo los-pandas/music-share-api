@@ -1,0 +1,10 @@
+---
+- title: 'My Private Playlist'
+  description: 'all types of music'
+  image_url: 'www.test.test'
+  creator: 'Xavier'
+  is_private: True
+- title: 'Empty playlist'
+  image_url: 'www.test.test'
+  creator: 'Xavier'
+  is_private: False
