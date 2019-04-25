@@ -9,6 +9,17 @@ module MusicShare
     many_to_many :playlist
 
     plugin :timestamps
+    plugin :whitelist_security
+    set_allowed_columns :title, :duration_seconds, :image_url, :artists
+
+    # Secure getters and setters
+    def image_url
+      SecureDB.decrypt(image_url_secure)
+    end
+
+    def image_url=(plaintext)
+      self.image_url_secure = SecureDB.encrypt(plaintext)
+    end
 
     # rubocop:disable MethodLength
     def to_json(options = {})

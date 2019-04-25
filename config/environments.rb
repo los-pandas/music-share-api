@@ -2,6 +2,7 @@
 
 require 'roda'
 require 'econfig'
+require './app/lib/secure_db'
 
 module MusicShare
   # Configuration for the API
@@ -35,5 +36,7 @@ module MusicShare
         DB
       end
     end
+
+    SecureDB.setup(config) # Load crypto keys
   end
 end

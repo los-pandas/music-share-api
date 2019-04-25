@@ -9,7 +9,7 @@ Sequel.migration do
 
       String :title, null: false
       Integer :duration_seconds, null: false
-      String :image_url
+      String :image_url_secure
       String :artists, default: 'Anonymous'
 
       DateTime :created_at

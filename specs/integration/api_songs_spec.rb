@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative './spec_helper'
+require_relative '../spec_helper'
 
 describe 'Test Song Handling' do # rubocop:disable BlockLength
   include Rack::Test::Methods
@@ -11,6 +11,8 @@ describe 'Test Song Handling' do # rubocop:disable BlockLength
     DATA[:songs].each do |song_data|
       MusicShare::Song.create(song_data)
     end
+
+    @req_header = { 'CONTENT_TYPE' => 'application/json' }
   end
 
   it 'HAPPY: should be able to get list of all songs' do
@@ -41,9 +43,8 @@ describe 'Test Song Handling' do # rubocop:disable BlockLength
     song_data = DATA[:songs][0]
     song_data['title'] = 'Perfect'
 
-    req_header = { 'CONTENT_TYPE' => 'application/json' }
     post 'api/v1/song',
-         song_data.to_json, req_header
+         song_data.to_json, @req_header
     _(last_response.status).must_equal 201
     # _(last_response.header['Location'].size).must_be :>, 0
 
@@ -56,9 +57,29 @@ describe 'Test Song Handling' do # rubocop:disable BlockLength
       song' do
     song_data = DATA[:songs][0]
 
-    req_header = { 'CONTENT_TYPE' => 'application/json' }
     post 'api/v1/song',
-         song_data.to_json, req_header
+         song_data.to_json, @req_header
     _(last_response.status).must_equal 400
+  end
+
+  it 'SECURITY: should not create songs with mass assignment' do
+    bad_data = DATA[:songs][0].clone
+    bad_data['title'] = 'Dive'
+    bad_data['created_at'] = '1900-01-01'
+    post 'api/v1/song',
+         bad_data.to_json, @req_header
+
+    _(last_response.status).must_equal 400
+    _(last_response.header['Location']).must_be_nil
+  end
+
+  it 'SECURITY: should prevent basic SQL injection targeting IDs' do
+    new_song = MusicShare::Song.create(title: 'New Song', duration_seconds: 120,
+                                       image_url: '', artists: 'new artist')
+    get "api/v1/song/#{new_song.id}%20or%20id%3E0"
+
+    # deliberately not reporting error -- don't give attacker information
+    _(last_response.status).must_equal 404
+    _(last_response.body['data']).must_be_nil
   end
 end

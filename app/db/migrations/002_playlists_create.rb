@@ -9,7 +9,7 @@ Sequel.migration do
 
       String :title, null: false
       String :description, default: ''
-      String :image_url
+      String :image_url_secure
       String :creator, null: false
       FalseClass :is_private, default: false
 

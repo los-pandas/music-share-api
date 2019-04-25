@@ -19,7 +19,8 @@ module MusicShare
       routing.on @api_root do # rubocop:disable BlockLength
         routing.on 'song' do
           routing.get String do |song_id|
-            song = Song.where(id: song_id).first
+            song = Song.where(id: :$find_id)
+                       .call(:select, find_id: Integer(song_id)).first
             song ? song.to_json : raise('Song not found')
           rescue StandardError => e
             routing.halt 404, { message: e.message }.to_json
@@ -45,7 +46,9 @@ module MusicShare
         end
         routing.on 'playlist' do
           routing.get String do |playlist_id|
-            playlist = Playlist.where(id: playlist_id).first
+            playlist = Playlist.where(id: :$find_id)
+                               .call(:select, find_id: Integer(playlist_id))
+                               .first
             playlist ? playlist.to_json : raise('Playlist not found')
           rescue StandardError => e
             routing.halt 404, { message: e.message }.to_json
@@ -77,10 +80,13 @@ module MusicShare
             raise('Missing playlist_id or song_id') unless !playlist_id.nil?\
                                                            && !song_id.nil?
 
-            playlist = Playlist.where(id: playlist_id).first
+            playlist = Playlist.where(id: :$find_id)
+                               .call(:select, find_id: Integer(playlist_id))
+                               .first
             raise('Playlist not found') if playlist.nil?
 
-            song = Song.where(id: song_id).first
+            song = Song.where(id: :$find_id)
+                       .call(:select, find_id: Integer(song_id)).first
             raise('Song not found') if song.nil?
 
             playlist.add_song(song)
