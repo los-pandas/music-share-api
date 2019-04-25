@@ -51,3 +51,4 @@ build-iPhoneSimulator/
 
 # others
 /app/db/store/*
+/config/secrets.yml

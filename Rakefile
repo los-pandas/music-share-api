@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rake/testtask'
+require './require_app'
 
 task default: :spec
 
@@ -11,7 +12,7 @@ end
 
 desc 'Test all the specs'
 Rake::TestTask.new(:spec) do |t|
-  t.pattern = 'specs/*_spec.rb'
+  t.pattern = 'specs/**/*_spec.rb'
   t.warning = false
 end
 
@@ -72,4 +73,12 @@ namespace :db do # rubocop:disable BlockLength
 
   desc 'Delete and migrate again'
   task reset: %i[drop migrate]
+end
+
+namespace :newkey do
+  desc 'Create sample cryptographic key for database'
+  task :db do
+    require_app('lib')
+    puts "DB_KEY: #{SecureDB.generate_key}"
+  end
 end

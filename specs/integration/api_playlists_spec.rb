@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative './spec_helper'
+require_relative '../spec_helper'
 
 describe 'Test Playlist Handling' do # rubocop:disable BlockLength
   include Rack::Test::Methods
@@ -20,6 +20,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
     MusicShare::Song.all.each do |song|
       playlist1.add_song(song)
     end
+    @req_header = { 'CONTENT_TYPE' => 'application/json' }
   end
 
   it 'HAPPY: should be able to get list of all playlists' do
@@ -50,9 +51,8 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
     playlist_data = DATA[:playlists][0]
     playlist_data['title'] = 'New playlist'
 
-    req_header = { 'CONTENT_TYPE' => 'application/json' }
     post 'api/v1/playlist',
-         playlist_data.to_json, req_header
+         playlist_data.to_json, @req_header
     _(last_response.status).must_equal 201
 
     created = JSON.parse(last_response.body)['data']['data']['attributes']
@@ -64,9 +64,8 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
       another playlist' do
     playlist_data = DATA[:playlists][0]
 
-    req_header = { 'CONTENT_TYPE' => 'application/json' }
     post 'api/v1/playlist',
-         playlist_data.to_json, req_header
+         playlist_data.to_json, @req_header
     _(last_response.status).must_equal 400
   end
 
@@ -74,9 +73,8 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
     playlist = MusicShare::Playlist.last
     song = MusicShare::Song.first
 
-    req_header = { 'CONTENT_TYPE' => 'application/json' }
     post 'api/v1/song-playlist',
-         { 'playlist_id': playlist.id, 'song_id': song.id }.to_json, req_header
+         { 'playlist_id': playlist.id, 'song_id': song.id }.to_json, @req_header
     _(last_response.status).must_equal 201
     created = JSON.parse(last_response.body)['data']
     playlist_updated = MusicShare::Playlist[playlist.id]
@@ -90,9 +88,31 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
       to a playlist' do
     playlist = MusicShare::Playlist.last
 
-    req_header = { 'CONTENT_TYPE' => 'application/json' }
     post 'api/v1/song-playlist',
-         { 'playlist_id': playlist.id, 'song_id': 'foobar' }.to_json, req_header
+         { 'playlist_id': playlist.id, 'song_id': 'foobar' }.to_json, \
+         @req_header
     _(last_response.status).must_equal 400
+  end
+
+  it 'SECURITY: should not create playlists with mass assignment' do
+    bad_data = DATA[:playlists][0].clone
+    bad_data['title'] = 'Bad Playlist'
+    bad_data['created_at'] = '1900-01-01'
+    post 'api/v1/playlist',
+         bad_data.to_json, @req_header
+
+    _(last_response.status).must_equal 400
+    _(last_response.header['Location']).must_be_nil
+  end
+
+  it 'SECURITY: should prevent basic SQL injection targeting IDs' do
+    new_playlist = MusicShare::Playlist.create(title: 'New Song',
+                                               description: '',
+                                               image_url: '', creator: 'new')
+    get "api/v1/playlist/#{new_playlist.id}%20or%20id%3E0"
+
+    # deliberately not reporting error -- don't give attacker information
+    _(last_response.status).must_equal 404
+    _(last_response.body['data']).must_be_nil
   end
 end
