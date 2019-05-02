@@ -41,7 +41,7 @@ task console: :print_env do
 end
 
 namespace :db do # rubocop:disable BlockLength
-  require_relative 'config/environments.rb' # load config info
+  require_app(nil) # loads config code files only
   require 'sequel'
 
   Sequel.extension :migration
@@ -71,8 +71,25 @@ namespace :db do # rubocop:disable BlockLength
     puts "Deleted #{app.config.DB_FILENAME}"
   end
 
-  desc 'Delete and migrate again'
-  task reset: %i[drop migrate]
+  task :load_models do
+    require_app(%w[lib models services])
+  end
+
+  task reset_seeds: %i[load_models] do
+    app.DB[:schema_seeds].delete if app.DB.tables.include?(:schema_seeds)
+    MusicShare::Account.dataset.destroy
+  end
+
+  desc 'Seeds the development database'
+  task seed: %i[load_models] do
+    require 'sequel/extensions/seed'
+    Sequel::Seed.setup(:development)
+    Sequel.extension :seed
+    Sequel::Seeder.apply(app.DB, 'app/db/seeds')
+  end
+
+  desc 'Delete all data and reseed'
+  task reseed: %i[reset_seeds seed]
 end
 
 namespace :newkey do

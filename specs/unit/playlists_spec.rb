@@ -2,27 +2,36 @@
 
 require_relative '../spec_helper'
 
-describe 'Test Playlist Handling' do
+describe 'Test Playlist Handling' do # rubocop:disable BlockLength
   include Rack::Test::Methods
 
   before do
     wipe_database
 
+    DATA[:accounts].each do |account_data|
+      MusicShare::Account.create(account_data)
+    end
+
+    account = MusicShare::Account.first
     DATA[:playlists].each do |playlist_data|
-      MusicShare::Playlist.create(playlist_data)
+      MusicShare::CreatePlaylistForCreator.call(account_id: account.id,
+                                                playlist_data: playlist_data)
     end
   end
 
   it 'HAPPY: should retrieve correct data from database' do
     playlist_data = DATA[:playlists][0]
     playlist_data['title'] = 'new title'
-    new_playlist = MusicShare::Playlist.create(playlist_data)
+    account = MusicShare::Account.first
+    new_playlist = MusicShare::CreatePlaylistForCreator.call(
+      account_id: account.id,
+      playlist_data: playlist_data
+    )
 
     playlist = MusicShare::Playlist.find(id: new_playlist.id)
     _(playlist.title).must_equal new_playlist.title
     _(playlist.description).must_equal new_playlist.description
     _(playlist.image_url).must_equal new_playlist.image_url
-    _(playlist.creator).must_equal new_playlist.creator
   end
 
   it 'SECURITY: should secure sensitive attributes' do

@@ -12,8 +12,14 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
       MusicShare::Song.create(song_data)
     end
 
+    DATA[:accounts].each do |account_data|
+      MusicShare::Account.create(account_data)
+    end
+
+    account = MusicShare::Account.first
     DATA[:playlists].each do |playlist_data|
-      MusicShare::Playlist.create(playlist_data)
+      MusicShare::CreatePlaylistForCreator.call(account_id: account.id,
+                                                playlist_data: playlist_data)
     end
 
     playlist1 = MusicShare::Playlist.first
@@ -49,7 +55,9 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
 
   it 'HAPPY: should be able to create new empty playlist' do
     playlist_data = DATA[:playlists][0]
-    playlist_data['title'] = 'New playlist'
+    playlist_data['title'] = 'new'
+    account = MusicShare::Account.first
+    playlist_data['account_id'] = account.id
 
     post 'api/v1/playlist',
          playlist_data.to_json, @req_header
@@ -63,7 +71,8 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
   it 'SAD: should return error if playlist title and creator both exist on \
       another playlist' do
     playlist_data = DATA[:playlists][0]
-
+    account = MusicShare::Account.first
+    playlist_data['account_id'] = account.id
     post 'api/v1/playlist',
          playlist_data.to_json, @req_header
     _(last_response.status).must_equal 400
@@ -108,7 +117,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
   it 'SECURITY: should prevent basic SQL injection targeting IDs' do
     new_playlist = MusicShare::Playlist.create(title: 'New Song',
                                                description: '',
-                                               image_url: '', creator: 'new')
+                                               image_url: '')
     get "api/v1/playlist/#{new_playlist.id}%20or%20id%3E0"
 
     # deliberately not reporting error -- don't give attacker information
