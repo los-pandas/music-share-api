@@ -28,6 +28,14 @@ Run the test specification script in `Rakefile`:
 rake spec
 ```
 
+## Develop/Debug
+
+Add fake data to the development database to work on this project:
+
+```bash
+rake db:seed
+```
+
 ## Routes
 
 ### Songs
@@ -66,5 +74,18 @@ rake spec
 		{
 		    "playlist_id": 1,
 		    "song_id": 3
+		}
+		```
+
+### Accounts
+- Get 'api/v1/account/[username]': returns the account information that matches the username
+- Post 'api/v1/account': saves a new account with the data received in json format
+	- Example:
+
+		```json
+		{
+		    "username": "xavier",
+		    "email": "xavier@nthu.edu.tw",
+		    "password":"secure"
 		}
 		```

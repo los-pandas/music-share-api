@@ -5,7 +5,7 @@ require 'json'
 
 module MusicShare
   # Roda class
-  class Api < Roda
+  class Api < Roda # rubocop:disable ClassLength
     plugin :halt
 
     route do |routing| # rubocop:disable BlockLength
@@ -17,6 +17,35 @@ module MusicShare
 
       @api_root = 'api/v1'
       routing.on @api_root do # rubocop:disable BlockLength
+        routing.on 'accounts' do
+          @account_route = "#{@api_root}/accounts"
+
+          routing.on String do |username|
+            # GET api/v1/accounts/[username]
+            routing.get do
+              account = Account.first(username: username)
+              account ? account.to_json : raise('Account not found')
+            rescue StandardError
+              routing.halt 404, { message: error.message }.to_json
+            end
+          end
+
+          # POST api/v1/accounts
+          routing.post do
+            new_data = JSON.parse(routing.body.read)
+            new_account = Account.new(new_data)
+            raise('Could not save account') unless new_account.save
+
+            response.status = 201
+            response['Location'] = "#{@account_route}/#{new_account.id}"
+            { message: 'Account saved', data: new_account }.to_json
+          rescue Sequel::MassAssignmentRestriction
+            routing.halt 400, { message: 'Illegal Request' }.to_json
+          rescue StandardError => e
+            puts e.inspect
+            routing.halt 500, { message: error.message }.to_json
+          end
+        end
         routing.on 'song' do
           routing.get String do |song_id|
             song = Song.where(id: :$find_id)
@@ -44,7 +73,7 @@ module MusicShare
             routing.halt 400, { message: error.message }.to_json
           end
         end
-        routing.on 'playlist' do
+        routing.on 'playlist' do # rubocop:disable BlockLength
           routing.get String do |playlist_id|
             playlist = Playlist.where(id: :$find_id)
                                .call(:select, find_id: Integer(playlist_id))
@@ -63,11 +92,14 @@ module MusicShare
 
           routing.post do
             new_data = JSON.parse(routing.body.read)
-            new_playlist = Playlist.new(new_data)
-            raise('Could not save playlist') unless new_playlist.save
+            account_id = new_data['account_id']
+            result = MusicShare::CreatePlaylistForCreator.call(
+              account_id: account_id, playlist_data: new_data
+            )
+            raise('Could not save playlist') if result.nil?
 
             response.status = 201
-            { message: 'Playlist saved', data: new_playlist }.to_json
+            { message: 'Playlist saved', data: result }.to_json
           rescue StandardError => error
             routing.halt 400, { message: error.message }.to_json
           end
@@ -77,19 +109,11 @@ module MusicShare
             data = JSON.parse(routing.body.read)
             playlist_id = data['playlist_id']
             song_id = data['song_id']
-            raise('Missing playlist_id or song_id') unless !playlist_id.nil?\
-                                                           && !song_id.nil?
+            result = MusicShare::AddSongToPlaylist.call(
+              playlist_id: playlist_id, song_id: song_id
+            )
+            raise('Could not add song to playlist') unless result
 
-            playlist = Playlist.where(id: :$find_id)
-                               .call(:select, find_id: Integer(playlist_id))
-                               .first
-            raise('Playlist not found') if playlist.nil?
-
-            song = Song.where(id: :$find_id)
-                       .call(:select, find_id: Integer(song_id)).first
-            raise('Song not found') if song.nil?
-
-            playlist.add_song(song)
             response.status = 201
             song_playlist = { playlist_id: playlist_id, song_id: song_id }
             { message: 'Song added to playlist', data: song_playlist }.to_json

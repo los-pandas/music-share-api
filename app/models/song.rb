@@ -8,9 +8,10 @@ module MusicShare
   class Song < Sequel::Model
     many_to_many :playlist
 
-    plugin :timestamps
     plugin :whitelist_security
     set_allowed_columns :title, :duration_seconds, :image_url, :artists
+    plugin :timestamps, update_on_create: true
+    plugin :association_dependencies, playlist: :nullify
 
     # Secure getters and setters
     def image_url

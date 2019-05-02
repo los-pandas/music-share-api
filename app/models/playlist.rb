@@ -7,10 +7,12 @@ module MusicShare
   # Song class
   class Playlist < Sequel::Model
     many_to_many :song
+    many_to_one :account
 
-    plugin :timestamps
     plugin :whitelist_security
-    set_allowed_columns :title, :description, :image_url, :creator, :is_private
+    set_allowed_columns :title, :description, :image_url, :is_private
+    plugin :timestamps, update_on_create: true
+    plugin :association_dependencies, song: :nullify
 
     # Secure getters and setters
     def image_url
@@ -32,7 +34,7 @@ module MusicShare
               title: title,
               description: description,
               image_url: image_url,
-              creator: creator,
+              account: account,
               is_private: is_private,
               songs: song
             }
