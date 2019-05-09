@@ -99,3 +99,10 @@ namespace :newkey do
     puts "DB_KEY: #{SecureDB.generate_key}"
   end
 end
+
+namespace :run do
+  # Run in development mode
+  task :dev do
+    sh 'rackup -p 3000'
+  end
+end

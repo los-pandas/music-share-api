@@ -44,7 +44,7 @@ def create_playlists # rubocop:disable MethodLength
         playlist['title'] == playlist_title
       end
       MusicShare::CreatePlaylistForCreator.call(
-        account_id: account.id, playlist_data: playlist_data
+        username_data: account.username, playlist_data: playlist_data
       )
     end
   end

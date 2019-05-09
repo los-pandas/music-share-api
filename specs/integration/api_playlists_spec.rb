@@ -18,8 +18,10 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
 
     account = MusicShare::Account.first
     DATA[:playlists].each do |playlist_data|
-      MusicShare::CreatePlaylistForCreator.call(account_id: account.id,
-                                                playlist_data: playlist_data)
+      MusicShare::CreatePlaylistForCreator.call(
+        username_data: account.username,
+        playlist_data: playlist_data
+      )
     end
 
     playlist1 = MusicShare::Playlist.first
@@ -57,7 +59,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
     playlist_data = DATA[:playlists][0]
     playlist_data['title'] = 'new'
     account = MusicShare::Account.first
-    playlist_data['account_id'] = account.id
+    playlist_data['username'] = account.username
 
     post 'api/v1/playlist',
          playlist_data.to_json, @req_header
@@ -72,7 +74,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
       another playlist' do
     playlist_data = DATA[:playlists][0]
     account = MusicShare::Account.first
-    playlist_data['account_id'] = account.id
+    playlist_data['username'] = account.username
     post 'api/v1/playlist',
          playlist_data.to_json, @req_header
     _(last_response.status).must_equal 400
@@ -115,9 +117,15 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
   end
 
   it 'SECURITY: should prevent basic SQL injection targeting IDs' do
-    new_playlist = MusicShare::Playlist.create(title: 'New Song',
-                                               description: '',
-                                               image_url: '')
+    account = MusicShare::Account.first
+    playlist_data = {}
+    playlist_data['title'] = 'New Playlist'
+    playlist_data['description'] = ''
+    playlist_data['image_url'] = ''
+    new_playlist = MusicShare::CreatePlaylistForCreator.call(
+      username_data: account.username,
+      playlist_data: playlist_data
+    )
     get "api/v1/playlist/#{new_playlist.id}%20or%20id%3E0"
 
     # deliberately not reporting error -- don't give attacker information

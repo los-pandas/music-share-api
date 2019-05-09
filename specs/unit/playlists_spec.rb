@@ -14,8 +14,10 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
 
     account = MusicShare::Account.first
     DATA[:playlists].each do |playlist_data|
-      MusicShare::CreatePlaylistForCreator.call(account_id: account.id,
-                                                playlist_data: playlist_data)
+      MusicShare::CreatePlaylistForCreator.call(
+        username_data: account.username,
+        playlist_data: playlist_data
+      )
     end
   end
 
@@ -24,7 +26,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
     playlist_data['title'] = 'new title'
     account = MusicShare::Account.first
     new_playlist = MusicShare::CreatePlaylistForCreator.call(
-      account_id: account.id,
+      username_data: account.username,
       playlist_data: playlist_data
     )
 
