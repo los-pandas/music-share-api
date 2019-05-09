@@ -18,10 +18,10 @@ describe 'Test Account Handling' do # rubocop:disable BlockLength
       _(last_response.status).must_equal 200
 
       result = JSON.parse last_response.body
-      _(result['username']).must_equal account.username
-      _(result['salt']).must_be_nil
-      _(result['password']).must_be_nil
-      _(result['password_hash']).must_be_nil
+      _(result['attributes']['username']).must_equal account.username
+      _(result['attributes']['salt']).must_be_nil
+      _(result['attributes']['password']).must_be_nil
+      _(result['attributes']['password_hash']).must_be_nil
     end
   end
 
@@ -36,7 +36,7 @@ describe 'Test Account Handling' do # rubocop:disable BlockLength
       _(last_response.status).must_equal 201
       _(last_response.header['Location'].size).must_be :>, 0
 
-      created = JSON.parse(last_response.body)['data']
+      created = JSON.parse(last_response.body)['data']['attributes']
       account = MusicShare::Account.first
 
       _(created['username']).must_equal @account_data['username']

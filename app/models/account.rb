@@ -28,8 +28,10 @@ module MusicShare
       JSON(
         {
           type: 'account',
-          username: username,
-          email: email
+          attributes: {
+            username: username,
+            email: email
+          }
         }, options
       )
     end

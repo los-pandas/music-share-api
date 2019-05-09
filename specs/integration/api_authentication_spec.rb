@@ -10,7 +10,7 @@ describe 'Test Authentication Routes' do # rubocop:disable BlockLength
     wipe_database
   end
 
-  describe 'Account Authentication' do
+  describe 'Account Authentication' do # rubocop:disable BlockLength
     before do
       @account_data = DATA[:accounts][1]
       @account = MusicShare::Account.create(@account_data)
@@ -23,9 +23,11 @@ describe 'Test Authentication Routes' do # rubocop:disable BlockLength
 
       auth_account = JSON.parse(last_response.body)
       _(last_response.status).must_equal 200
-      _(auth_account['username'].must_equal(@account_data['username']))
-      _(auth_account['email'].must_equal(@account_data['email']))
-      _(auth_account['id'].must_be_nil)
+      _(auth_account['attributes']['username'].must_equal(
+          @account_data['username']
+        ))
+      _(auth_account['attributes']['email'].must_equal(@account_data['email']))
+      _(auth_account['attributes']['id'].must_be_nil)
     end
 
     it 'BAD: should not authenticate invalid password' do

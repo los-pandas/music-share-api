@@ -45,8 +45,8 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
     _(last_response.status).must_equal 200
 
     result = JSON.parse last_response.body
-    _(result['data']['attributes']['id']).must_equal playlist.id
-    _(result['data']['attributes']['title']).must_equal playlist.title
+    _(result['attributes']['id']).must_equal playlist.id
+    _(result['attributes']['title']).must_equal playlist.title
   end
 
   it 'SAD: should return error if unknown playlist requested' do
@@ -65,7 +65,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
          playlist_data.to_json, @req_header
     _(last_response.status).must_equal 201
 
-    created = JSON.parse(last_response.body)['data']['data']['attributes']
+    created = JSON.parse(last_response.body)['data']['attributes']
 
     _(created['title']).must_equal playlist_data['title']
   end
