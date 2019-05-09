@@ -34,7 +34,6 @@ module MusicShare
         response.status = 201
         { message: 'Playlist saved', data: result }.to_json
       rescue StandardError => error
-        #puts error
         routing.halt 400, { message: error.message }.to_json
       end
     end
