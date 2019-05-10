@@ -27,17 +27,15 @@ module MusicShare
     def to_json(options = {})
       JSON(
         {
-          data: {
-            type: 'playlist',
-            attributes: {
-              id: id,
-              title: title,
-              description: description,
-              image_url: image_url,
-              account: account,
-              is_private: is_private,
-              songs: song
-            }
+          type: 'playlist',
+          attributes: {
+            id: id,
+            title: title,
+            description: description,
+            image_url: image_url,
+            account: account,
+            is_private: is_private,
+            songs: song
           }
         }, options
       )
