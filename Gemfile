@@ -23,6 +23,10 @@ group :development, :test do
   gem 'sqlite3'
 end
 
+group :production do
+  gem 'pg'
+end
+
 # Security
 gem 'bundler-audit'
 gem 'rbnacl', '~>6.0'
