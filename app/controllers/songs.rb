@@ -29,8 +29,8 @@ module MusicShare
 
         response.status = 201
         { message: 'Song saved', data: new_song }.to_json
-      rescue StandardError => error
-        routing.halt 400, { message: error.message }.to_json
+      rescue StandardError => e
+        routing.halt 400, { message: e.message }.to_json
       end
     end
   end

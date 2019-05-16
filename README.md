@@ -11,7 +11,7 @@ bundle install
 ## Execute
 
 ```shell
-rackup
+rake run:dev
 ```
 
 ## Test
