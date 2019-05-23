@@ -17,10 +17,11 @@ module MusicShare
       end
 
       routing.get do
-        output = { data: Playlist.all }
-        JSON.pretty_generate(output)
+        account = Account.first(username: @auth_account['username'])
+        playlists = account.playlists
+        JSON.pretty_generate(data: playlists)
       rescue StandardError
-        routing.halt 404, message: 'Could not find playlists'
+        routing.halt 403, message: 'Could not find playlists'
       end
 
       routing.post do

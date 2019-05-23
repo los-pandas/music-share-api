@@ -40,6 +40,12 @@ task console: :print_env do
   sh 'pry -r ./specs/test_load_all'
 end
 
+desc 'Create sample cryptographic key for tokens and messaging'
+task :msg do
+  require_app('lib')
+  puts "MSG_KEY: #{AuthToken.generate_key}"
+end
+
 namespace :db do # rubocop:disable BlockLength
   require_app(nil) # loads config code files only
   require 'sequel'
@@ -97,6 +103,11 @@ namespace :newkey do
   task :db do
     require_app('lib')
     puts "DB_KEY: #{SecureDB.generate_key}"
+  end
+  desc 'Create sample cryptographic key for tokens and messaging'
+  task :msg do
+    require_app('lib')
+    puts "MSG_KEY: #{AuthToken.generate_key}"
   end
 end
 
