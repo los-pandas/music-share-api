@@ -31,12 +31,33 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
     @req_header = { 'CONTENT_TYPE' => 'application/json' }
   end
 
-  it 'HAPPY: should be able to get list of all playlists' do
-    get 'api/v1/playlist'
-    _(last_response.status).must_equal 200
+  describe 'Getting list of playlists' do
+    before do
+      @account_data = DATA[:accounts][0]
+    end
 
-    result = JSON.parse last_response.body
-    _(result['data'].count).must_equal 2
+    it 'HAPPY: should get list for authorized account' do
+      auth = MusicShare::AuthenticateAccount.call(
+        username: @account_data['username'],
+        password: @account_data['password']
+      )
+
+      header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
+      get 'api/v1/playlist'
+      _(last_response.status).must_equal 200
+
+      result = JSON.parse last_response.body
+      _(result['data'].count).must_equal 2
+    end
+
+    it 'BAD: should not process for unauthorized account' do
+      header 'AUTHORIZATION', 'Bearer bad_token'
+      get 'api/v1/playlist'
+      _(last_response.status).must_equal 403
+
+      result = JSON.parse last_response.body
+      _(result['data']).must_be_nil
+    end
   end
 
   it 'HAPPY: should be able to get details of a single playlists' do

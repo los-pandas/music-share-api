@@ -22,12 +22,11 @@ describe 'Test Authentication Routes' do # rubocop:disable BlockLength
       post 'api/v1/auth/authenticate', credentials.to_json, @req_header
 
       auth_account = JSON.parse(last_response.body)
+      account = auth_account['attributes']['account']['attributes']
       _(last_response.status).must_equal 200
-      _(auth_account['attributes']['username'].must_equal(
-          @account_data['username']
-        ))
-      _(auth_account['attributes']['email'].must_equal(@account_data['email']))
-      _(auth_account['attributes']['id'].must_be_nil)
+      _(account['username'].must_equal(@account_data['username']))
+      _(account['email'].must_equal(@account_data['email']))
+      _(account['id'].must_be_nil)
     end
 
     it 'BAD: should not authenticate invalid password' do

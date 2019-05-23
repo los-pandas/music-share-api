@@ -14,6 +14,10 @@ gem 'rake'
 
 # Debugging
 gem 'pry'
+gem 'rack-test'
+
+# external services
+gem 'http'
 
 # Database
 gem 'hirb'
@@ -41,9 +45,4 @@ end
 group :development do
   gem 'rubocop'
   gem 'rubocop-performance'
-end
-
-group :development, :test do
-  gem 'rack-test'
-  gem 'rerun'
 end
