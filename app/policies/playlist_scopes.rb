@@ -7,7 +7,7 @@ module MusicShare
     class AccountScope
       def initialize(current_account)
         @current_account = current_account
-        @owned = created_playlists
+        @created = created_playlists
         @full_scope = all_playlists
       end
 
@@ -16,7 +16,7 @@ module MusicShare
       end
 
       def owned
-        @owned
+        @created
       end
 
       private
@@ -30,7 +30,7 @@ module MusicShare
       end
 
       def public_playlists
-        MusicShare::Playlist.reject { |p| p.is_private }
+        MusicShare::Playlist.reject(&:is_private)
       end
     end
   end
