@@ -35,7 +35,7 @@ module MusicShare
 
       routing.post do
         new_data = JSON.parse(routing.body.read)
-        username = new_data['username']
+        username = @auth_account.username
         result = MusicShare::CreatePlaylistForCreator.call(
           username_data: username, playlist_data: new_data
         )

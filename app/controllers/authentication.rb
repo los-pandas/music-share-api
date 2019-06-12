@@ -16,6 +16,7 @@ module MusicShare
           response.status = 202
           { message: 'Verification email sent' }.to_json
         rescue VerifyRegistration::InvalidRegistration => e
+          puts e.message
           routing.halt 400, { message: e.message }.to_json
         rescue StandardError => e
           puts "ERROR VERIFYING REGISTRATION: #{e.inspect}"

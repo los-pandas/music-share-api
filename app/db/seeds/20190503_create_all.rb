@@ -59,12 +59,12 @@ end
 def add_songs_playlist # rubocop:disable MethodLength
   playlist_song_info = PLAYLIST_SONGS_INFO
   playlist_song_info.each do |belongs|
-    playlist_id = MusicShare::Playlist.first(title: belongs['playlist_title'])
-                                      .id
+    playlist = MusicShare::Playlist.first(title: belongs['playlist_title'])
+    playlist_id = playlist.id
     belongs['song_title'].each do |song_title|
       song_id = MusicShare::Song.first(title: song_title).id
       MusicShare::AddSongToPlaylist.call(
-        playlist_id: playlist_id, song_id: song_id
+        account: playlist.account, playlist_id: playlist_id, song_id: song_id
       )
     end
   end
