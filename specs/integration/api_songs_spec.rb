@@ -12,10 +12,21 @@ describe 'Test Song Handling' do # rubocop:disable BlockLength
       MusicShare::Song.create(song_data)
     end
 
+    DATA[:accounts].each do |account_data|
+      MusicShare::Account.create(account_data)
+    end
+
     @req_header = { 'CONTENT_TYPE' => 'application/json' }
+    @account_data = DATA[:accounts][0]
   end
 
   it 'HAPPY: should be able to get list of all songs' do
+    auth = MusicShare::AuthenticateAccount.call(
+      username: @account_data['username'],
+      password: @account_data['password']
+    )
+
+    header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     get '/api/v1/song'
     _(last_response.status).must_equal 200
 
@@ -25,15 +36,27 @@ describe 'Test Song Handling' do # rubocop:disable BlockLength
 
   it 'HAPPY: should be able to get details of a single song' do
     song = MusicShare::Song.first
+    auth = MusicShare::AuthenticateAccount.call(
+      username: @account_data['username'],
+      password: @account_data['password']
+    )
+
+    header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     get "api/v1/song/#{song.id}"
     _(last_response.status).must_equal 200
 
-    result = JSON.parse last_response.body
+    result = JSON.parse(last_response.body)['data']
     _(result['attributes']['id']).must_equal song.id
     _(result['attributes']['title']).must_equal song.title
   end
 
   it 'SAD: should return error if unknown song requested' do
+    auth = MusicShare::AuthenticateAccount.call(
+      username: @account_data['username'],
+      password: @account_data['password']
+    )
+
+    header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     get '/api/v1/song/foobar'
 
     _(last_response.status).must_equal 404
@@ -42,21 +65,30 @@ describe 'Test Song Handling' do # rubocop:disable BlockLength
   it 'HAPPY: should be able to create new song' do
     song_data = DATA[:songs][0]
     song_data['title'] = 'Perfect'
+    auth = MusicShare::AuthenticateAccount.call(
+      username: @account_data['username'],
+      password: @account_data['password']
+    )
 
+    header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     post 'api/v1/song',
          song_data.to_json, @req_header
     _(last_response.status).must_equal 201
     # _(last_response.header['Location'].size).must_be :>, 0
-
     created = JSON.parse(last_response.body)['data']['attributes']
-
+    # puts "Created #{created}"
     _(created['title']).must_equal song_data['title']
   end
 
   it 'SAD: should return error if song title and artist both exist on another \
       song' do
     song_data = DATA[:songs][0]
+    auth = MusicShare::AuthenticateAccount.call(
+      username: @account_data['username'],
+      password: @account_data['password']
+    )
 
+    header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     post 'api/v1/song',
          song_data.to_json, @req_header
     _(last_response.status).must_equal 400
@@ -66,6 +98,12 @@ describe 'Test Song Handling' do # rubocop:disable BlockLength
     bad_data = DATA[:songs][0].clone
     bad_data['title'] = 'Dive'
     bad_data['created_at'] = '1900-01-01'
+    auth = MusicShare::AuthenticateAccount.call(
+      username: @account_data['username'],
+      password: @account_data['password']
+    )
+
+    header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     post 'api/v1/song',
          bad_data.to_json, @req_header
 
@@ -76,6 +114,12 @@ describe 'Test Song Handling' do # rubocop:disable BlockLength
   it 'SECURITY: should prevent basic SQL injection targeting IDs' do
     new_song = MusicShare::Song.create(title: 'New Song', duration_seconds: 120,
                                        image_url: '', artists: 'new artist')
+    auth = MusicShare::AuthenticateAccount.call(
+      username: @account_data['username'],
+      password: @account_data['password']
+    )
+
+    header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     get "api/v1/song/#{new_song.id}%20or%20id%3E0"
 
     # deliberately not reporting error -- don't give attacker information

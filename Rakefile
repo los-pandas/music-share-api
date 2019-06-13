@@ -78,7 +78,7 @@ namespace :db do # rubocop:disable BlockLength
   end
 
   task :load_models do
-    require_app(%w[lib models services])
+    require_app(%w[lib policies models services])
   end
 
   task reset_seeds: %i[load_models] do

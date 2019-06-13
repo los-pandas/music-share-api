@@ -23,23 +23,30 @@ module MusicShare
       self.image_url_secure = SecureDB.encrypt(plaintext)
     end
 
-    # rubocop:disable MethodLength
-    def to_json(options = {})
-      JSON(
-        {
-          type: 'playlist',
-          attributes: {
-            id: id,
-            title: title,
-            description: description,
-            image_url: image_url,
-            account: account,
-            is_private: is_private,
-            songs: song
-          }
-        }, options
+    def summary
+      {
+        type: 'playlist',
+        attributes: {
+          id: id,
+          title: title,
+          description: description,
+          image_url: image_url,
+          is_private: is_private
+        }
+      }
+    end
+
+    def full_details
+      summary.merge(
+        relationships: {
+          owner: account,
+          songs: song
+        }
       )
     end
-    # rubocop:enable MethodLength
+
+    def to_json(options = {})
+      JSON(summary, options)
+    end
   end
 end

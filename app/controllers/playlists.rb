@@ -7,18 +7,27 @@ module MusicShare
   # Web controller for Credence API
   class Api < Roda
     route('playlist') do |routing| # rubocop:disable BlockLength
+      unless @auth_account
+        routing.halt 403, { message: 'Not authorized' }.to_json
+      end
+
       routing.get String do |playlist_id|
-        playlist = Playlist.where(id: :$find_id)
-                           .call(:select, find_id: Integer(playlist_id))
-                           .first
-        playlist ? playlist.to_json : raise('Playlist not found')
-      rescue StandardError => e
+        playlist = GetPlaylistQuery.call(
+          account: @auth_account, playlist_id: playlist_id
+        )
+
+        { data: playlist }.to_json
+      rescue GetPlaylistQuery::ForbiddenError => e
+        routing.halt 403, { message: e.message }.to_json
+      rescue GetPlaylistQuery::NotFoundError => e
         routing.halt 404, { message: e.message }.to_json
+      rescue StandardError => e
+        puts "FIND PLAYLIST ERROR: #{e.inspect}"
+        routing.halt 500, { message: 'API server error' }.to_json
       end
 
       routing.get do
-        account = Account.first(username: @auth_account['username'])
-        playlists = account.playlists
+        playlists = PlaylistPolicy::AccountScope.new(@auth_account).owned
         JSON.pretty_generate(data: playlists)
       rescue StandardError
         routing.halt 403, message: 'Could not find playlists'
@@ -26,7 +35,7 @@ module MusicShare
 
       routing.post do
         new_data = JSON.parse(routing.body.read)
-        username = new_data['username']
+        username = @auth_account.username
         result = MusicShare::CreatePlaylistForCreator.call(
           username_data: username, playlist_data: new_data
         )
