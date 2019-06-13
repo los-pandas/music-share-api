@@ -13,20 +13,19 @@ describe 'Test Account Handling' do # rubocop:disable BlockLength
     it 'HAPPY: should be able to get details of a single account' do
       account_data = DATA[:accounts][1]
       account = MusicShare::Account.create(account_data)
-      auth = MusicShare::AuthenticateAccount.call(
-        username: account_data['username'],
-        password: account_data['password']
-      )
+      auth = authenticate(account_data)
 
       header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
       get "/api/v1/account/#{account.username}"
       _(last_response.status).must_equal 200
 
-      result = JSON.parse last_response.body
-      _(result['attributes']['username']).must_equal account.username
-      _(result['attributes']['salt']).must_be_nil
-      _(result['attributes']['password']).must_be_nil
-      _(result['attributes']['password_hash']).must_be_nil
+      result = JSON.parse(last_response.body)['data']['attributes']
+      account_data = result['account']['attributes']
+      _(account_data['username']).must_equal account.username
+      _(account_data['salt']).must_be_nil
+      _(account_data['password']).must_be_nil
+      _(account_data['password_hash']).must_be_nil
+      _(result['auth_token']).wont_be_nil
     end
   end
 

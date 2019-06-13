@@ -15,7 +15,8 @@ module MusicShare
     end
 
     def self.call(credentials)
-      account = Account.first(username: credentials[:username])
+      account = Account.where(username: :$find_username)
+                       .call(:select, find_username: credentials[:username])[0]
       unless account.password?(credentials[:password])
         raise(UnauthorizedError, credentials)
       end

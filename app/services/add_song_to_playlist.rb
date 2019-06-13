@@ -17,13 +17,13 @@ module MusicShare
       end
     end
 
-    def self.call(account:, playlist_id:, song_id:)
+    def self.call(auth:, playlist_id:, song_id:)
       check_input(playlist_id, song_id)
       playlist = get_playlist(playlist_id)
       song = get_song(song_id)
       raise IllegalRequestError unless !playlist.nil? && !song.nil?
 
-      policy = PlaylistPolicy.new(account, playlist)
+      policy = PlaylistPolicy.new(auth[:account], playlist, auth[:scope])
       raise ForbiddenError unless policy.can_add_songs_to_playlist?
 
       playlist.add_song(song)

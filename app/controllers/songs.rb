@@ -8,12 +8,12 @@ module MusicShare
   class Api < Roda
     route('song') do |routing| # rubocop:disable BlockLength
       unless @auth_account
-        routing.halt 403, { message: 'Not authorized' }.to_json
+        routing.halt 403, { message: UNAUTH_MSG }.to_json
       end
 
       routing.get String do |song_id|
         song = GetSongQuery.call(
-          account: @auth_account, song_id: song_id
+          auth: @auth, song_id: song_id
         )
 
         { data: song }.to_json

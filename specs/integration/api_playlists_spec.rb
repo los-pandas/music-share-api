@@ -18,10 +18,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
 
     account = MusicShare::Account.first
     DATA[:playlists].each do |playlist_data|
-      MusicShare::CreatePlaylistForCreator.call(
-        username_data: account.username,
-        playlist_data: playlist_data
-      )
+      account.add_playlist(playlist_data)
     end
 
     playlist1 = MusicShare::Playlist.first
@@ -35,10 +32,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
 
   describe 'Getting list of playlists' do
     it 'HAPPY: should get list for authorized account' do
-      auth = MusicShare::AuthenticateAccount.call(
-        username: @account_data['username'],
-        password: @account_data['password']
-      )
+      auth = authenticate(@account_data)
 
       header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
       get 'api/v1/playlist'
@@ -59,10 +53,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
   end
 
   it 'HAPPY: should be able to get details of a single playlists' do
-    auth = MusicShare::AuthenticateAccount.call(
-      username: @account_data['username'],
-      password: @account_data['password']
-    )
+    auth = authenticate(@account_data)
     account = MusicShare::Account.first(
       username: auth[:attributes][:account][:username]
     )
@@ -78,10 +69,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
   end
 
   it 'SAD: should return error if unknown playlist requested' do
-    auth = MusicShare::AuthenticateAccount.call(
-      username: @account_data['username'],
-      password: @account_data['password']
-    )
+    auth = authenticate(@account_data)
 
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     get '/api/v1/playlist/foobar'
@@ -90,14 +78,11 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
   end
 
   it 'HAPPY: should be able to create new empty playlist' do
-    playlist_data = DATA[:playlists][0]
+    playlist_data = DATA[:playlists][0].clone
     playlist_data['title'] = 'new'
-    playlist_data['username'] = @account_data['username']
+    #playlist_data['username'] = @account_data['username']
 
-    auth = MusicShare::AuthenticateAccount.call(
-      username: @account_data['username'],
-      password: @account_data['password']
-    )
+    auth = authenticate(@account_data)
 
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     post 'api/v1/playlist',
@@ -111,12 +96,9 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
 
   it 'SAD: should return error if playlist title and creator both exist on \
       another playlist' do
-    playlist_data = DATA[:playlists][0]
-    playlist_data['username'] = @account_data['username']
-    auth = MusicShare::AuthenticateAccount.call(
-      username: @account_data['username'],
-      password: @account_data['password']
-    )
+    playlist_data = DATA[:playlists][0].clone
+    #playlist_data['username'] = @account_data['username']
+    auth = authenticate(@account_data)
 
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     post 'api/v1/playlist',
@@ -126,10 +108,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
 
   it 'HAPPY: should be able to add song to a playlist' do
     song = MusicShare::Song.first
-    auth = MusicShare::AuthenticateAccount.call(
-      username: @account_data['username'],
-      password: @account_data['password']
-    )
+    auth = authenticate(@account_data)
     account = MusicShare::Account.first(
       username: auth[:attributes][:account][:username]
     )
@@ -149,10 +128,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
   it 'SAD: should return error if try to add a song that does not exist /
       to a playlist' do
     playlist = MusicShare::Playlist.last
-    auth = MusicShare::AuthenticateAccount.call(
-      username: @account_data['username'],
-      password: @account_data['password']
-    )
+    auth = authenticate(@account_data)
 
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     post 'api/v1/song-playlist',
@@ -165,10 +141,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
     bad_data = DATA[:playlists][0].clone
     bad_data['title'] = 'Bad Playlist'
     bad_data['created_at'] = '1900-01-01'
-    auth = MusicShare::AuthenticateAccount.call(
-      username: @account_data['username'],
-      password: @account_data['password']
-    )
+    auth = authenticate(@account_data)
 
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     post 'api/v1/playlist',
@@ -184,14 +157,8 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
     playlist_data['title'] = 'New Playlist'
     playlist_data['description'] = ''
     playlist_data['image_url'] = ''
-    new_playlist = MusicShare::CreatePlaylistForCreator.call(
-      username_data: account.username,
-      playlist_data: playlist_data
-    )
-    auth = MusicShare::AuthenticateAccount.call(
-      username: @account_data['username'],
-      password: @account_data['password']
-    )
+    new_playlist = account.add_playlist(playlist_data)
+    auth = authenticate(@account_data)
 
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     get "api/v1/playlist/#{new_playlist.id}%20or%20id%3E0"

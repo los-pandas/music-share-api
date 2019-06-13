@@ -17,14 +17,14 @@ module MusicShare
       end
     end
 
-    def self.call(account:, playlist_id:)
+    def self.call(auth:, playlist_id:)
       playlist_id = Integer(playlist_id)
       playlist = Playlist.where(id: :$find_id)
                          .call(:select, find_id: playlist_id)
                          .first
       raise NotFoundError unless playlist
 
-      policy = PlaylistPolicy.new(account, playlist)
+      policy = PlaylistPolicy.new(auth[:account], playlist, auth[:scope])
       raise ForbiddenError unless policy.can_view?
 
       playlist.full_details.merge(policies: policy.summary)
