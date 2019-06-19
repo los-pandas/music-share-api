@@ -4,7 +4,7 @@ require 'roda'
 require_relative './app'
 
 module MusicShare
-  # Web controller for Credence API
+  # Web controller for MusicShare API
   class Api < Roda
     route('song-playlist') do |routing|
       unless @auth_account
@@ -16,7 +16,7 @@ module MusicShare
         playlist_id = data['playlist_id']
         song_id = data['song_id']
         MusicShare::AddSongToPlaylist.call(
-          account: @auth_account, playlist_id: playlist_id, song_id: song_id
+          auth: @auth, playlist_id: playlist_id, song_id: song_id
         )
         response.status = 201
         song_playlist = { playlist_id: playlist_id, song_id: song_id }

@@ -10,12 +10,12 @@ module MusicShare
       end
     end
 
-    def self.call(account:, song_id:)
+    def self.call(auth:, song_id:)
       song = Song.where(id: :$find_id)
                  .call(:select, find_id: Integer(song_id)).first
       raise NotFoundError unless song
 
-      policy = SongPolicy.new(account, song)
+      policy = SongPolicy.new(auth[:account], song, auth[:scope])
       raise ForbiddenError unless policy.can_view?
 
       song.full_details.merge(policies: policy.summary)

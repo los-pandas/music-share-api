@@ -3,29 +3,30 @@
 module MusicShare
   # Policy to determine if account can interact with a playlist
   class PlaylistPolicy
-    def initialize(account, playlist)
+    def initialize(account, playlist, auth_scope = nil)
       @account = account
       @playlist = playlist
+      @auth_scope = auth_scope
     end
 
     def can_view?
-      playlist_is_public? || account_is_creator?
+      can_read? && (playlist_is_public? || account_is_creator?)
     end
 
     def can_edit?
-      account_is_creator?
+      can_write? && account_is_creator?
     end
 
     def can_delete?
-      account_is_creator?
+      can_write? && account_is_creator?
     end
 
     def can_add_songs_to_playlist?
-      account_is_creator?
+      can_write? && account_is_creator?
     end
 
     def can_delete_songs_from_playlist?
-      account_is_creator?
+      can_write? && account_is_creator?
     end
 
     def summary
@@ -46,6 +47,14 @@ module MusicShare
 
     def account_is_creator?
       @playlist.account == @account
+    end
+
+    def can_read?
+      @auth_scope ? @auth_scope.can_read?('playlists') : false
+    end
+
+    def can_write?
+      @auth_scope ? @auth_scope.can_write?('playlists') : false
     end
   end
 end

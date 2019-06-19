@@ -4,16 +4,14 @@ require 'roda'
 require_relative './app'
 
 module MusicShare
-  # Web controller for Credence API
+  # Web controller for MusicShare API
   class Api < Roda
     route('song') do |routing| # rubocop:disable BlockLength
-      unless @auth_account
-        routing.halt 403, { message: 'Not authorized' }.to_json
-      end
+      routing.halt 403, { message: UNAUTH_MSG }.to_json unless @auth_account
 
       routing.get String do |song_id|
         song = GetSongQuery.call(
-          account: @auth_account, song_id: song_id
+          auth: @auth, song_id: song_id
         )
 
         { data: song }.to_json

@@ -3,15 +3,17 @@
 module MusicShare
   # create a playlist for a account
   class CreatePlaylistForCreator
-    def self.call(username_data:, playlist_data:)
-      playlist_data.delete('username')
-      raise('Could not save playlist') if username_data.nil?
+    # Error
+    class ForbiddenError < StandardError
+      def message
+        'You are not allowed to add create more playlists'
+      end
+    end
 
-      account = Account.where(username: :$find_username)
-                       .call(:select, find_username: username_data)
-                       .first
-      playlist = account.add_playlist(playlist_data)
-      playlist
+    def self.call(auth:, playlist_data:)
+      raise ForbiddenError unless auth[:scope].can_write?('playlists')
+
+      auth[:account].add_playlist(playlist_data)
     end
   end
 end

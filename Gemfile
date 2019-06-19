@@ -39,6 +39,7 @@ gem 'rbnacl', '~>6.0'
 group :test do
   gem 'minitest'
   gem 'minitest-rg'
+  gem 'webmock'
 end
 
 # Development

@@ -21,10 +21,7 @@ describe 'Test Song Handling' do # rubocop:disable BlockLength
   end
 
   it 'HAPPY: should be able to get list of all songs' do
-    auth = MusicShare::AuthenticateAccount.call(
-      username: @account_data['username'],
-      password: @account_data['password']
-    )
+    auth = authenticate(@account_data)
 
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     get '/api/v1/song'
@@ -36,10 +33,7 @@ describe 'Test Song Handling' do # rubocop:disable BlockLength
 
   it 'HAPPY: should be able to get details of a single song' do
     song = MusicShare::Song.first
-    auth = MusicShare::AuthenticateAccount.call(
-      username: @account_data['username'],
-      password: @account_data['password']
-    )
+    auth = authenticate(@account_data)
 
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     get "api/v1/song/#{song.id}"
@@ -51,10 +45,7 @@ describe 'Test Song Handling' do # rubocop:disable BlockLength
   end
 
   it 'SAD: should return error if unknown song requested' do
-    auth = MusicShare::AuthenticateAccount.call(
-      username: @account_data['username'],
-      password: @account_data['password']
-    )
+    auth = authenticate(@account_data)
 
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     get '/api/v1/song/foobar'
@@ -65,10 +56,7 @@ describe 'Test Song Handling' do # rubocop:disable BlockLength
   it 'HAPPY: should be able to create new song' do
     song_data = DATA[:songs][0]
     song_data['title'] = 'Perfect'
-    auth = MusicShare::AuthenticateAccount.call(
-      username: @account_data['username'],
-      password: @account_data['password']
-    )
+    auth = authenticate(@account_data)
 
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     post 'api/v1/song',
@@ -83,10 +71,7 @@ describe 'Test Song Handling' do # rubocop:disable BlockLength
   it 'SAD: should return error if song title and artist both exist on another \
       song' do
     song_data = DATA[:songs][0]
-    auth = MusicShare::AuthenticateAccount.call(
-      username: @account_data['username'],
-      password: @account_data['password']
-    )
+    auth = authenticate(@account_data)
 
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     post 'api/v1/song',
@@ -98,10 +83,7 @@ describe 'Test Song Handling' do # rubocop:disable BlockLength
     bad_data = DATA[:songs][0].clone
     bad_data['title'] = 'Dive'
     bad_data['created_at'] = '1900-01-01'
-    auth = MusicShare::AuthenticateAccount.call(
-      username: @account_data['username'],
-      password: @account_data['password']
-    )
+    auth = authenticate(@account_data)
 
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     post 'api/v1/song',
@@ -114,10 +96,7 @@ describe 'Test Song Handling' do # rubocop:disable BlockLength
   it 'SECURITY: should prevent basic SQL injection targeting IDs' do
     new_song = MusicShare::Song.create(title: 'New Song', duration_seconds: 120,
                                        image_url: '', artists: 'new artist')
-    auth = MusicShare::AuthenticateAccount.call(
-      username: @account_data['username'],
-      password: @account_data['password']
-    )
+    auth = authenticate(@account_data)
 
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     get "api/v1/song/#{new_song.id}%20or%20id%3E0"
