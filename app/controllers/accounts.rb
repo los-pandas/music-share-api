@@ -4,7 +4,7 @@ require 'roda'
 require_relative './app'
 
 module MusicShare
-  # Web controller for Credence API
+  # Web controller for MusicShare API
   class Api < Roda
     route('account') do |routing| # rubocop:disable BlockLength
       @account_route = "#{@api_root}/account"
@@ -25,7 +25,7 @@ module MusicShare
         end
       end
 
-      # POST api/v1/accounts
+      # POST api/v1/account
       routing.post do
         new_data = JSON.parse(routing.body.read)
         new_account = Account.new(new_data)

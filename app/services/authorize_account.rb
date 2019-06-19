@@ -13,8 +13,6 @@ module MusicShare
     def self.call(auth:, username:, auth_scope:)
       account = Account.first(username: username)
       policy = AccountPolicy.new(auth[:account], account)
-      policy.can_view? ? account : raise(ForbiddenError)
-
       raise ForbiddenError unless policy.can_view?
 
       account_and_token(account, auth_scope)

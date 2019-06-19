@@ -4,7 +4,7 @@ require 'roda'
 require_relative './app'
 
 module MusicShare
-  # Web controller for Credence API
+  # Web controller for MusicShare API
   class Api < Roda
     route('playlist') do |routing| # rubocop:disable BlockLength
       unless @auth_account
