@@ -80,7 +80,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
   it 'HAPPY: should be able to create new empty playlist' do
     playlist_data = DATA[:playlists][0].clone
     playlist_data['title'] = 'new'
-    #playlist_data['username'] = @account_data['username']
+    # playlist_data['username'] = @account_data['username']
 
     auth = authenticate(@account_data)
 
@@ -97,7 +97,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
   it 'SAD: should return error if playlist title and creator both exist on \
       another playlist' do
     playlist_data = DATA[:playlists][0].clone
-    #playlist_data['username'] = @account_data['username']
+    # playlist_data['username'] = @account_data['username']
     auth = authenticate(@account_data)
 
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"

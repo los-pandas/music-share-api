@@ -20,7 +20,7 @@ def wipe_playlists_songs
 end
 
 def authenticate(account_data)
-  credentials = {} # rubocop:disable Style/MutableConstant
+  credentials = {}
   credentials[:username] = account_data['username']
   credentials[:password] = account_data['password']
   MusicShare::AuthenticateAccount.call(credentials)

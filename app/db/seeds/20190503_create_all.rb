@@ -36,7 +36,7 @@ def create_accounts
   end
 end
 
-def create_playlists # rubocop:disable MethodLength
+def create_playlists
   OWNERS_INFO.each do |owner|
     account = MusicShare::Account.first(username: owner['username'])
     owner['playlist_title'].each do |playlist_title|
@@ -54,7 +54,7 @@ def create_songs
   end
 end
 
-def add_songs_playlist # rubocop:disable MethodLength
+def add_songs_playlist
   playlist_song_info = PLAYLIST_SONGS_INFO
   playlist_song_info.each do |belongs|
     playlist = MusicShare::Playlist.first(title: belongs['playlist_title'])
