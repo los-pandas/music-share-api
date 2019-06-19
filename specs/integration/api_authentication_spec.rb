@@ -20,7 +20,8 @@ describe 'Test Authentication Routes' do # rubocop:disable BlockLength
     it 'HAPPY: should authenticate valid credentials' do
       credentials = { username: @account_data['username'],
                       password: @account_data['password'] }
-      post 'api/v1/auth/authenticate', credentials.to_json, @req_header
+      post 'api/v1/auth/authenticate',
+           SignedRequest.new(app.config).sign(credentials).to_json, @req_header
 
       auth_account = JSON.parse(last_response.body)
       account = auth_account['data']['attributes']['account']['attributes']
@@ -34,7 +35,8 @@ describe 'Test Authentication Routes' do # rubocop:disable BlockLength
       credentials = { username: @account_data['username'],
                       password: 'fakepassword' }
       assert_output(/invalid/i, '') do
-        post 'api/v1/auth/authenticate', credentials.to_json, @req_header
+        post 'api/v1/auth/authenticate',
+             SignedRequest.new(app.config).sign(credentials).to_json, @req_header
       end
 
       result = JSON.parse(last_response.body)
@@ -61,7 +63,9 @@ describe 'Test Authentication Routes' do # rubocop:disable BlockLength
     it 'HAPPY AUTH SSO: should authenticate+authorize new valid SSO account' do
       gh_access_token = { access_token: GOOD_GH_ACCESS_TOKEN }
 
-      post 'api/v1/auth/sso', gh_access_token.to_json, @req_header
+      post 'api/v1/auth/sso',
+           SignedRequest.new(app.config).sign(gh_access_token).to_json,
+           @req_header
 
       auth_account = JSON.parse(last_response.body)['data']
       account = auth_account['attributes']['account']['attributes']
@@ -79,7 +83,9 @@ describe 'Test Authentication Routes' do # rubocop:disable BlockLength
       )
 
       gh_access_token = { access_token: GOOD_GH_ACCESS_TOKEN }
-      post 'api/v1/auth/sso', gh_access_token.to_json, @req_header
+      post 'api/v1/auth/sso',
+           SignedRequest.new(app.config).sign(gh_access_token).to_json,
+           @req_header
 
       auth_account = JSON.parse(last_response.body)['data']
       account = auth_account['attributes']['account']['attributes']
