@@ -9,7 +9,8 @@ module MusicShare
     many_to_many :playlist
 
     plugin :whitelist_security
-    set_allowed_columns :title, :duration_seconds, :image_url, :artists
+    set_allowed_columns :title, :duration_seconds, :image_url, :artists, 
+                        :external_url
     plugin :timestamps, update_on_create: true
     plugin :association_dependencies, playlist: :nullify
 
@@ -22,7 +23,7 @@ module MusicShare
       self.image_url_secure = SecureDB.encrypt(plaintext)
     end
 
-    def summary
+    def summary # rubocop:disable Metrics/MethodLength
       {
         type: 'song',
         attributes: {
@@ -30,6 +31,7 @@ module MusicShare
           title: title,
           duration_seconds: duration_seconds,
           image_url: image_url,
+          external_url: external_url,
           artists: artists
         }
       }

@@ -8,11 +8,16 @@ module MusicShare
       def initialize(current_account)
         @current_account = current_account
         @created = created_playlists
+        @public = public_playlists
         @full_scope = all_playlists
       end
 
       def viewable
         @full_scope
+      end
+
+      def public
+        @public
       end
 
       def owned

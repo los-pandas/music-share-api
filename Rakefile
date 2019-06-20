@@ -61,9 +61,11 @@ namespace :db do # rubocop:disable BlockLength
 
   desc 'Delete database'
   task :delete do
+    app.DB[:account_sp_tokens].delete
     app.DB[:playlists_songs].delete
     app.DB[:songs].delete
     app.DB[:playlists].delete
+    app.DB[:accounts].delete
   end
 
   desc 'Delete dev or test database file'

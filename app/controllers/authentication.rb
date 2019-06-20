@@ -43,15 +43,32 @@ module MusicShare
       end
 
       # POST /api/v1/auth/sso
-      routing.post 'sso' do
-        auth_account = AuthorizeSso.new(Api.config)
-                                   .call(@request_data[:access_token])
+      routing.is 'sso/github' do
+        routing.post do
+          auth_account = AuthorizeGithubSso.new(Api.config)
+                                           .call(@request_data[:access_token])
 
-        { data: auth_account }.to_json
-      rescue StandardError => error
-        puts "FAILED to validate Github account: #{error.inspect}"
-        puts error.backtrace
-        routing.halt 400
+          { data: auth_account }.to_json
+        rescue StandardError => error
+          puts "FAILED to validate Github account: #{error.inspect}"
+          puts error.backtrace
+          routing.halt 400
+        end
+      end
+      routing.is 'sso/spotify' do
+        routing.post do
+          auth_account = AuthorizeSpotifySso.new(Api.config)
+                                            .call(
+                                              @request_data[:token],
+                                              @request_data[:refresh_token]
+                                            )
+
+          { data: auth_account }.to_json
+        rescue StandardError => error
+          puts "FAILED to validate spotify account: #{error.inspect}"
+          puts error.backtrace
+          routing.halt 400
+        end
       end
     end
   end
