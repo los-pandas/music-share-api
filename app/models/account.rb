@@ -10,14 +10,26 @@ module MusicShare
     one_to_many :playlists
     plugin :association_dependencies, playlists: :destroy
 
+    one_to_one :account_sp_token, class: :'MusicShare::AccountSPToken'
+    plugin :association_dependencies, account_sp_token: :destroy
+
     plugin :whitelist_security
-    set_allowed_columns :username, :email, :password
+    set_allowed_columns :username, :email, :password, :account_sp_token
 
     plugin :timestamps, update_on_create: true
 
     def self.create_github_account(github_account)
       create(username: github_account[:username],
              email: github_account[:email])
+    end
+
+    def self.create_spotify_account(spotify_account)
+      account = create(username: spotify_account[:username],
+                       email: spotify_account[:email])
+      token_data = { token: spotify_account[:token],
+                     refresh_token: spotify_account[:refresh_token] }
+      account.account_sp_token = AccountSPToken.create(token_data)
+      account
     end
 
     def password=(new_password)
@@ -36,9 +48,17 @@ module MusicShare
           attributes: {
             username: username,
             email: email
-          }
+          },
+          spotify_token: account_sp_token
         }, options
       )
+    end
+
+    def spotify_token_hash
+      {
+        token: account_sp_token.token,
+        refresh_token: account_sp_token.refresh_token
+      }
     end
   end
 end

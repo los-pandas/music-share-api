@@ -4,7 +4,7 @@ require 'http'
 
 module MusicShare
   # Find or create an SsoAccount based on Github code
-  class AuthorizeSso
+  class AuthorizeGithubSso
     def initialize(config)
       @config = config
     end
