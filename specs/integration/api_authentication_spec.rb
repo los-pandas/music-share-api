@@ -63,7 +63,7 @@ describe 'Test Authentication Routes' do # rubocop:disable BlockLength
     it 'HAPPY AUTH SSO: should authenticate+authorize new valid SSO account' do
       gh_access_token = { access_token: GOOD_GH_ACCESS_TOKEN }
 
-      post 'api/v1/auth/sso',
+      post 'api/v1/auth/sso/github',
            SignedRequest.new(app.config).sign(gh_access_token).to_json,
            @req_header
 
@@ -83,7 +83,7 @@ describe 'Test Authentication Routes' do # rubocop:disable BlockLength
       )
 
       gh_access_token = { access_token: GOOD_GH_ACCESS_TOKEN }
-      post 'api/v1/auth/sso',
+      post 'api/v1/auth/sso/github',
            SignedRequest.new(app.config).sign(gh_access_token).to_json,
            @req_header
 

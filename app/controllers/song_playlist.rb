@@ -6,7 +6,7 @@ require_relative './app'
 module MusicShare
   # Web controller for MusicShare API
   class Api < Roda
-    route('song-playlist') do |routing|
+    route('song-playlist') do |routing| # rubocop:disable BlockLength
       unless @auth_account
         routing.halt 403, { message: 'Not authorized' }.to_json
       end
@@ -17,9 +17,7 @@ module MusicShare
         song_data = data['song_data']
         song = Song.find(external_url: song_data['external_url'])
         song_id = song.id unless song.nil?
-        if song.nil?
-          song_id = Song.create(song_data).id
-        end
+        song_id = Song.create(song_data).id if song.nil?
         MusicShare::AddSongToPlaylist.call(
           auth: @auth, playlist_id: playlist_id, song_id: song_id
         )
@@ -29,6 +27,8 @@ module MusicShare
       rescue AddSongToPlaylist::ForbiddenError => e
         routing.halt 403, { message: e.message }.to_json
       rescue AddSongToPlaylist::IllegalRequestError => e
+        routing.halt 400, { message: e.message }.to_json
+      rescue Sequel::NotNullConstraintViolation => e
         routing.halt 400, { message: e.message }.to_json
       rescue StandardError => e
         puts "ADD SONG TO PLAYLIST ERROR: #{e.inspect}"

@@ -16,9 +16,7 @@ module MusicShare
         @full_scope
       end
 
-      def public
-        @public
-      end
+      attr_reader :public
 
       def owned
         @created

@@ -115,7 +115,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
     playlist = account.playlists.last
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     post 'api/v1/song-playlist',
-         { 'playlist_id': playlist.id, 'song_id': song.id }.to_json, @req_header
+         { 'playlist_id': playlist.id, 'song_data': { external_url: song.external_url } }.to_json, @req_header
     _(last_response.status).must_equal 201
     created = JSON.parse(last_response.body)['data']
     playlist_updated = MusicShare::Playlist[playlist.id]
@@ -132,7 +132,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
 
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     post 'api/v1/song-playlist',
-         { 'playlist_id': playlist.id, 'song_id': 'foobar' }.to_json, \
+         { 'playlist_id': playlist.id, 'song_data': { external_url: 'foobar' } }.to_json, \
          @req_header
     _(last_response.status).must_equal 400
   end

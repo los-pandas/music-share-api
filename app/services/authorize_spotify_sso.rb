@@ -33,15 +33,15 @@ module MusicShare
       token_data = { token: account_data[:token],
                      refresh_token: account_data[:refresh_token] }
       if account.nil?
-        puts "created user and tokens"
+        puts 'created user and tokens'
         account = Account.create_spotify_account(account_data)
       else
         account_sp_token = AccountSPToken.first(account_id: account.id)
         if account_sp_token.nil?
-          puts "created tokens for existing user"
+          puts 'created tokens for existing user'
           account.account_sp_token = AccountSPToken.create(token_data)
         else
-          puts "Updated tokens for existing user"
+          puts 'Updated tokens for existing user'
           account_sp_token.update(token: token_data[:token],
                                   refresh_token: token_data[:refresh_token])
         end

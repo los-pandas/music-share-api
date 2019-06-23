@@ -56,6 +56,7 @@ describe 'Test Song Handling' do # rubocop:disable BlockLength
   it 'HAPPY: should be able to create new song' do
     song_data = DATA[:songs][0]
     song_data['title'] = 'Perfect'
+    song_data['external_url'] = 'new_url'
     auth = authenticate(@account_data)
 
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
@@ -95,7 +96,7 @@ describe 'Test Song Handling' do # rubocop:disable BlockLength
 
   it 'SECURITY: should prevent basic SQL injection targeting IDs' do
     new_song = MusicShare::Song.create(title: 'New Song', duration_seconds: 120,
-                                       image_url: '', artists: 'new artist')
+                                       image_url: '', artists: 'new artist', external_url: 'new_external_url')
     auth = authenticate(@account_data)
 
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"

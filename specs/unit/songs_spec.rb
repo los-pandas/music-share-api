@@ -16,6 +16,7 @@ describe 'Test Song Handling' do
   it 'HAPPY: should retrieve correct data from database' do
     song_data = DATA[:songs][0]
     song_data['title'] = 'new title'
+    song_data['external_url'] = 'external_url'
     new_song = MusicShare::Song.create(song_data)
 
     song = MusicShare::Song.find(id: new_song.id)

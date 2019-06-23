@@ -64,7 +64,7 @@ describe 'Test Account Handling' do # rubocop:disable BlockLength
     it 'BAD SIGNED_REQUEST: should not accept unsigned requests' do
       post 'api/v1/account', @account_data.to_json
       _(last_response.status).must_equal 403
-      _(last_response.header['Location']).must_equal nil
+      _(last_response.header['Location']).must_be_nil
     end
   end
 end

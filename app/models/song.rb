@@ -9,7 +9,7 @@ module MusicShare
     many_to_many :playlist
 
     plugin :whitelist_security
-    set_allowed_columns :title, :duration_seconds, :image_url, :artists, 
+    set_allowed_columns :title, :duration_seconds, :image_url, :artists,
                         :external_url
     plugin :timestamps, update_on_create: true
     plugin :association_dependencies, playlist: :nullify
