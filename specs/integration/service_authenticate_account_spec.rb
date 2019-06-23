@@ -11,7 +11,7 @@ describe 'Test authentication service' do # rubocop:disable BlockLength
     end
   end
 
-  it 'HAPPY: should authenticate valid account credentials' do
+  it 'HAPPY AUTHENTICATION: should authenticate valid account credentials' do
     credentials = DATA[:accounts].first
     account = authenticate(credentials)
     # account = MusicShare::AuthenticateAccount.call(
@@ -20,7 +20,7 @@ describe 'Test authentication service' do # rubocop:disable BlockLength
     _(account).wont_be_nil
   end
 
-  it 'SAD: will not authenticate with invalid password' do
+  it 'SAD AUTHENTICATION: will not authenticate with invalid password' do
     credentials = DATA[:accounts].first
     proc {
       credentials['password'] = 'malword'
@@ -31,7 +31,7 @@ describe 'Test authentication service' do # rubocop:disable BlockLength
     }.must_raise MusicShare::AuthenticateAccount::UnauthorizedError
   end
 
-  it 'BAD: will not authenticate with invalid credentials' do
+  it 'BAD AUTHENTICATION: will not authenticate with invalid credentials' do
     credentials = {}
     proc {
       credentials['username'] = 'maluser'

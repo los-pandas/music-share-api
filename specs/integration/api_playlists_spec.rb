@@ -31,7 +31,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
   end
 
   describe 'Getting list of playlists' do
-    it 'HAPPY: should get list for authorized account' do
+    it 'HAPPY AUTHORIZATION: should get list for authorized account' do
       auth = authenticate(@account_data)
 
       header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
@@ -42,7 +42,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
       _(result['data'].count).must_equal 2
     end
 
-    it 'BAD: should not process for unauthorized account' do
+    it 'BAD AUTHORIZATION: should not process for unauthorized account' do
       header 'AUTHORIZATION', 'Bearer bad_token'
       get 'api/v1/playlist'
       _(last_response.status).must_equal 403
@@ -155,7 +155,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
   end
 
   it 'HAPPY: should be able to add song to a playlist' do
-    song = MusicShare::Song.first
+    # song = MusicShare::Song.first
     auth = authenticate(@account_data)
     account = MusicShare::Account.first(
       username: auth[:attributes][:account][:username]
@@ -164,13 +164,16 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     post 'api/v1/song-playlist',
          { 'playlist_id': playlist.id,
-           'song_data': { external_url: song.external_url } }.to_json,
+           'song_data': { external_id: 'asdf',
+                          title: 'addcited to you',
+                          external_url: 'new ext url',
+                          artists: 'avicii',
+                          duration_seconds: 500 } }.to_json,
          @req_header
     _(last_response.status).must_equal 201
     created = JSON.parse(last_response.body)['data']
     playlist_updated = MusicShare::Playlist[playlist.id]
 
-    _(created['song_id']).must_equal song.id
     _(created['playlist_id']).must_equal playlist.id
     _(playlist_updated.song.length).must_equal 1
   end
@@ -188,7 +191,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
     _(last_response.status).must_equal 400
   end
 
-  it 'BAD: should not create playlists with mass assignment' do
+  it 'BAD MASS_ASSIGNMENT: should not create playlists with mass assignment' do
     bad_data = DATA[:playlists][0].clone
     bad_data['title'] = 'Bad Playlist'
     bad_data['created_at'] = '1900-01-01'
@@ -202,7 +205,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
     _(last_response.header['Location']).must_be_nil
   end
 
-  it 'BAD: should prevent basic SQL injection targeting IDs' do
+  it 'BAD SQL_INJECTION: should prevent basic SQL injection targeting IDs' do
     account = MusicShare::Account.first
     playlist_data = {}
     playlist_data['title'] = 'New Playlist'

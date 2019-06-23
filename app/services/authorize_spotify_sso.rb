@@ -25,6 +25,7 @@ module MusicShare
 
       account = SpotifyAccount.new(sp_response.parse)
       { username: account.username, email: account.email,
+        display_name: account.display_name,
         token: token, refresh_token: refresh_token }
     end
 
@@ -70,11 +71,15 @@ module MusicShare
       end
 
       def username
-        @sp_account['uri']
+        @sp_account['id']
       end
 
       def email
         @sp_account['email']
+      end
+
+      def display_name
+        @sp_account['display_name']
       end
     end
   end

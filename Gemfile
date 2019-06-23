@@ -15,6 +15,7 @@ gem 'rake'
 # Debugging
 gem 'pry'
 gem 'rack-test'
+gem 'simplecov'
 
 # external services
 gem 'http'

@@ -66,7 +66,7 @@ module MusicShare
       end
 
       routing.delete String do |playlist_id|
-        new_data = JSON.parse(routing.body.read) || {}
+        new_data = {}
         new_data['id'] = playlist_id
         result = MusicShare::DeletePlaylistForCreator.call(
           auth: @auth, playlist_data: new_data

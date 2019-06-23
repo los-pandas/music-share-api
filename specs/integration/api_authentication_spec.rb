@@ -17,7 +17,7 @@ describe 'Test Authentication Routes' do # rubocop:disable BlockLength
       @account = MusicShare::Account.create(@account_data)
     end
 
-    it 'HAPPY: should authenticate valid credentials' do
+    it 'HAPPY AUTHENTICATION: should authenticate valid credentials' do
       credentials = { username: @account_data['username'],
                       password: @account_data['password'] }
       post 'api/v1/auth/authenticate',
@@ -31,7 +31,7 @@ describe 'Test Authentication Routes' do # rubocop:disable BlockLength
       _(account['id'].must_be_nil)
     end
 
-    it 'BAD: should not authenticate invalid password' do
+    it 'BAD AUTHENTICATION: should not authenticate invalid password' do
       credentials = { username: @account_data['username'],
                       password: 'fakepassword' }
       assert_output(/invalid/i, '') do
@@ -61,7 +61,7 @@ describe 'Test Authentication Routes' do # rubocop:disable BlockLength
       WebMock.disable!
     end
 
-    it 'HAPPY AUTH SSO: should authenticate+authorize new valid SSO account' do
+    it 'HAPPY AUTHORIZATION SSO: should authenticate+authorize new valid SSO account' do # rubocop:disable LineLength
       gh_access_token = { access_token: GOOD_GH_ACCESS_TOKEN }
 
       post 'api/v1/auth/sso/github',
@@ -77,7 +77,7 @@ describe 'Test Authentication Routes' do # rubocop:disable BlockLength
       _(account['id'].must_be_nil)
     end
 
-    it 'HAPPY AUTH SSO: should authorize existing SSO account' do
+    it 'HAPPY AUTH AUTHORIZATION: should authorize existing SSO account' do
       MusicShare::Account.create(
         username: SSO_ACCOUNT['sso_username'],
         email: SSO_ACCOUNT['email']

@@ -15,7 +15,7 @@ module MusicShare
         data = JSON.parse(routing.body.read)
         playlist_id = Integer(data['playlist_id'])
         song_data = data['song_data']
-        song = Song.find(external_url: song_data['external_url'])
+        song = Song.find(external_id: song_data['external_id'])
         song_id = song.id unless song.nil?
         song_id = Song.create(song_data).id if song.nil?
         MusicShare::AddSongToPlaylist.call(

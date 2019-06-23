@@ -29,13 +29,18 @@ module MusicShare
       can_write? && account_is_creator?
     end
 
+    def can_export?
+      can_read? && (playlist_is_public? || account_is_creator?)
+    end
+
     def summary
       {
         can_view: can_view?,
         can_edit: can_edit?,
         can_delete: can_delete?,
         can_add_songs_to_playlist: can_add_songs_to_playlist?,
-        can_delete_songs_from_playlist: can_delete_songs_from_playlist?
+        can_delete_songs_from_playlist: can_delete_songs_from_playlist?,
+        can_export: can_export?
       }
     end
 

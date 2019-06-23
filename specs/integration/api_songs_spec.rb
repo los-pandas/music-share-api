@@ -55,8 +55,9 @@ describe 'Test Song Handling' do # rubocop:disable BlockLength
 
   it 'HAPPY: should be able to create new song' do
     song_data = DATA[:songs][0]
-    song_data['title'] = 'Perfect'
+    song_data['title'] = 'new song 1'
     song_data['external_url'] = 'new_url'
+    song_data['external_id'] = 'new_id'
     auth = authenticate(@account_data)
 
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
@@ -80,7 +81,7 @@ describe 'Test Song Handling' do # rubocop:disable BlockLength
     _(last_response.status).must_equal 400
   end
 
-  it 'SECURITY: should not create songs with mass assignment' do
+  it 'BAD MASS_ASSIGNMENT: should not create songs with mass assignment' do
     bad_data = DATA[:songs][0].clone
     bad_data['title'] = 'Dive'
     bad_data['created_at'] = '1900-01-01'
@@ -94,10 +95,11 @@ describe 'Test Song Handling' do # rubocop:disable BlockLength
     _(last_response.header['Location']).must_be_nil
   end
 
-  it 'SECURITY: should prevent basic SQL injection targeting IDs' do
+  it 'BAD SQL_INJECTION: should prevent basic SQL injection targeting IDs' do
     new_song = MusicShare::Song.create(title: 'New Song', duration_seconds: 120,
                                        image_url: '', artists: 'new artist',
-                                       external_url: 'new_external_url')
+                                       external_url: 'new_external_url',
+                                       external_id: 'new_external_id')
     auth = authenticate(@account_data)
 
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"

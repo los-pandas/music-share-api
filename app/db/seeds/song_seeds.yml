@@ -4,13 +4,16 @@
   image_url: 'www.test.test'
   artists: 'Ed Sheeran'
   external_url: 'www.test.test1'
+  external_id: '1'
 - title: 'Everlong'
   duration_seconds: 200
   image_url: 'www.test.test2'
   artists: 'Foo Fighters'
   external_url: 'www.test.test2'
+  external_id: '2'
 - title: 'Rap God'
   duration_seconds: 600
   image_url: 'www.test.test2'
   artists: 'Eminem'
   external_url: 'www.test.test3'
+  external_id: '3'

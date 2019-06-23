@@ -2,6 +2,8 @@
 
 ENV['RACK_ENV'] = 'test'
 
+require 'simplecov'
+SimpleCov.start
 require 'minitest/autorun'
 require 'minitest/rg'
 require 'yaml'

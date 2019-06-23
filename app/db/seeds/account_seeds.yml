@@ -2,6 +2,8 @@
 - username: xavier
   email: xavier@nthu.edu.tw
   password: '12345678'
+  display_name: xavier
 - username: soumya.ray
   email: sray@nthu.edu.tw
   password: mypa$$w0rd
+  display_name: soumya

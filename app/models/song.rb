@@ -10,7 +10,7 @@ module MusicShare
 
     plugin :whitelist_security
     set_allowed_columns :title, :duration_seconds, :image_url, :artists,
-                        :external_url
+                        :external_url, :external_id, :type
     plugin :timestamps, update_on_create: true
     plugin :association_dependencies, playlist: :nullify
 
@@ -32,6 +32,7 @@ module MusicShare
           duration_seconds: duration_seconds,
           image_url: image_url,
           external_url: external_url,
+          external_id: external_id,
           artists: artists
         }
       }
