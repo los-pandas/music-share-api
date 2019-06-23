@@ -36,7 +36,8 @@ describe 'Test Authentication Routes' do # rubocop:disable BlockLength
                       password: 'fakepassword' }
       assert_output(/invalid/i, '') do
         post 'api/v1/auth/authenticate',
-             SignedRequest.new(app.config).sign(credentials).to_json, @req_header
+             SignedRequest.new(app.config).sign(credentials).to_json,
+             @req_header
       end
 
       result = JSON.parse(last_response.body)

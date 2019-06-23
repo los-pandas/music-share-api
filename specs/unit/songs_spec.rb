@@ -26,7 +26,7 @@ describe 'Test Song Handling' do
     _(song.artists).must_equal new_song.artists
   end
 
-  it 'SECURITY: should secure sensitive attributes' do
+  it 'HAPPY: should secure sensitive attributes' do
     song = MusicShare::Song.first
     stored_song = app.DB[:songs].first
 

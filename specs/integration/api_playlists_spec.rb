@@ -94,6 +94,54 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
     _(created['title']).must_equal playlist_data['title']
   end
 
+  it 'HAPPY: should be able to update an existing playlist' do
+    auth = authenticate(@account_data)
+    account = MusicShare::Account.first(
+      username: auth[:attributes][:account][:username]
+    )
+    playlist = account.playlists.first
+    playlist_data = { title: 'New title' }
+    header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
+    put "api/v1/playlist/#{playlist.id}",
+        playlist_data.to_json, @req_header
+    _(last_response.status).must_equal 200
+
+    updated = JSON.parse(last_response.body)['data']['attributes']
+
+    _(updated['title']).must_equal 'New title'
+  end
+
+  it 'SAD: should return error if trying to update a non-existing playlist' do
+    auth = authenticate(@account_data)
+
+    header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
+    put 'api/v1/playlist/0', {}.to_json, @req_header
+    _(last_response.status).must_equal 404
+  end
+
+  it 'HAPPY: should be able to delete an existing playlist' do
+    auth = authenticate(@account_data)
+    account = MusicShare::Account.first(
+      username: auth[:attributes][:account][:username]
+    )
+    playlist = account.playlists.first
+    header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
+    delete "api/v1/playlist/#{playlist.id}", {}.to_json, @req_header
+    _(last_response.status).must_equal 200
+
+    deleted = JSON.parse(last_response.body)['data']['attributes']
+
+    _(deleted['title']).must_equal playlist.title
+  end
+
+  it 'SAD: should return error if trying to delete a non-existing playlist' do
+    auth = authenticate(@account_data)
+
+    header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
+    delete 'api/v1/playlist/0', {}.to_json, @req_header
+    _(last_response.status).must_equal 404
+  end
+
   it 'SAD: should return error if playlist title and creator both exist on \
       another playlist' do
     playlist_data = DATA[:playlists][0].clone
@@ -115,7 +163,9 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
     playlist = account.playlists.last
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     post 'api/v1/song-playlist',
-         { 'playlist_id': playlist.id, 'song_data': { external_url: song.external_url } }.to_json, @req_header
+         { 'playlist_id': playlist.id,
+           'song_data': { external_url: song.external_url } }.to_json,
+         @req_header
     _(last_response.status).must_equal 201
     created = JSON.parse(last_response.body)['data']
     playlist_updated = MusicShare::Playlist[playlist.id]
@@ -132,12 +182,13 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
 
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
     post 'api/v1/song-playlist',
-         { 'playlist_id': playlist.id, 'song_data': { external_url: 'foobar' } }.to_json, \
+         { 'playlist_id': playlist.id,
+           'song_data': { external_url: 'foobar' } }.to_json,
          @req_header
     _(last_response.status).must_equal 400
   end
 
-  it 'SECURITY: should not create playlists with mass assignment' do
+  it 'BAD: should not create playlists with mass assignment' do
     bad_data = DATA[:playlists][0].clone
     bad_data['title'] = 'Bad Playlist'
     bad_data['created_at'] = '1900-01-01'
@@ -151,7 +202,7 @@ describe 'Test Playlist Handling' do # rubocop:disable BlockLength
     _(last_response.header['Location']).must_be_nil
   end
 
-  it 'SECURITY: should prevent basic SQL injection targeting IDs' do
+  it 'BAD: should prevent basic SQL injection targeting IDs' do
     account = MusicShare::Account.first
     playlist_data = {}
     playlist_data['title'] = 'New Playlist'

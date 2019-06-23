@@ -4,6 +4,7 @@ require 'roda'
 require_relative './app'
 
 module MusicShare
+  # Web controller for MusicShare API
   class Api < Roda
     route('public') do |routing|
       routing.halt 403, { message: UNAUTH_MSG }.to_json unless @auth_account

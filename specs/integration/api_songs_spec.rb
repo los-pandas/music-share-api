@@ -96,7 +96,8 @@ describe 'Test Song Handling' do # rubocop:disable BlockLength
 
   it 'SECURITY: should prevent basic SQL injection targeting IDs' do
     new_song = MusicShare::Song.create(title: 'New Song', duration_seconds: 120,
-                                       image_url: '', artists: 'new artist', external_url: 'new_external_url')
+                                       image_url: '', artists: 'new artist',
+                                       external_url: 'new_external_url')
     auth = authenticate(@account_data)
 
     header 'AUTHORIZATION', "Bearer #{auth[:attributes][:auth_token]}"
