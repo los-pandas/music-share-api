@@ -16,7 +16,7 @@ module MusicShare
       account_and_token(sso_account)
     end
 
-    def self.get_spotify_account(token, refresh_token)
+    def get_spotify_account(token, refresh_token)
       sp_response = HTTP.headers(user_agent: 'Config Secure',
                                  authorization: "Bearer #{token}",
                                  accept: 'application/json')
@@ -28,7 +28,7 @@ module MusicShare
         token: token, refresh_token: refresh_token }
     end
 
-    def self.find_or_create_sso_account(account_data)
+    def find_or_create_sso_account(account_data)
       account = Account.first(email: account_data[:email])
       token_data = { token: account_data[:token],
                      refresh_token: account_data[:refresh_token] }
@@ -36,12 +36,12 @@ module MusicShare
         puts 'created user and tokens'
         account = Account.create_spotify_account(account_data)
       else
-        handle_existing_account(accout, token_data)
+        handle_existing_account(account, token_data)
       end
       account
     end
 
-    def self.handle_existing_account(account, token_data)
+    def handle_existing_account(account, token_data)
       account_sp_token = AccountSPToken.first(account_id: account.id)
       if account_sp_token.nil?
         puts 'created tokens for existing user'
@@ -53,7 +53,7 @@ module MusicShare
       end
     end
 
-    def self.account_and_token(account)
+    def account_and_token(account)
       {
         type: 'sso_account',
         attributes: {
