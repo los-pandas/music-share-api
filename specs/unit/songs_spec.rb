@@ -15,7 +15,9 @@ describe 'Test Song Handling' do
 
   it 'HAPPY: should retrieve correct data from database' do
     song_data = DATA[:songs][0]
-    song_data['title'] = 'new title'
+    song_data['title'] = 'new_title'
+    song_data['external_url'] = 'external_url'
+    song_data['external_id'] = 'external_url'
     new_song = MusicShare::Song.create(song_data)
 
     song = MusicShare::Song.find(id: new_song.id)
@@ -25,7 +27,7 @@ describe 'Test Song Handling' do
     _(song.artists).must_equal new_song.artists
   end
 
-  it 'SECURITY: should secure sensitive attributes' do
+  it 'HAPPY: should secure sensitive attributes' do
     song = MusicShare::Song.first
     stored_song = app.DB[:songs].first
 

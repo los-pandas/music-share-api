@@ -25,6 +25,7 @@ module MusicShare
 
       account = SpotifyAccount.new(sp_response.parse)
       { username: account.username, email: account.email,
+        display_name: account.display_name,
         token: token, refresh_token: refresh_token }
     end
 
@@ -33,20 +34,24 @@ module MusicShare
       token_data = { token: account_data[:token],
                      refresh_token: account_data[:refresh_token] }
       if account.nil?
-        puts "created user and tokens"
+        puts 'created user and tokens'
         account = Account.create_spotify_account(account_data)
       else
-        account_sp_token = AccountSPToken.first(account_id: account.id)
-        if account_sp_token.nil?
-          puts "created tokens for existing user"
-          account.account_sp_token = AccountSPToken.create(token_data)
-        else
-          puts "Updated tokens for existing user"
-          account_sp_token.update(token: token_data[:token],
-                                  refresh_token: token_data[:refresh_token])
-        end
+        handle_existing_account(account, token_data)
       end
       account
+    end
+
+    def handle_existing_account(account, token_data)
+      account_sp_token = AccountSPToken.first(account_id: account.id)
+      if account_sp_token.nil?
+        puts 'created tokens for existing user'
+        account.account_sp_token = AccountSPToken.create(token_data)
+      else
+        puts 'Updated tokens for existing user'
+        account_sp_token.update(token: token_data[:token],
+                                refresh_token: token_data[:refresh_token])
+      end
     end
 
     def account_and_token(account)
@@ -66,11 +71,15 @@ module MusicShare
       end
 
       def username
-        @sp_account['uri']
+        @sp_account['id']
       end
 
       def email
         @sp_account['email']
+      end
+
+      def display_name
+        @sp_account['display_name']
       end
     end
   end

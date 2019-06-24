@@ -8,11 +8,15 @@ module MusicShare
   class Playlist < Sequel::Model
     many_to_many :song
     many_to_one :account
+    many_to_many :shared_accounts,
+                 class: :'MusicShare::Account',
+                 join_table: :accounts_playlists,
+                 left_key: :playlist_id, right_key: :account_shared_id
 
     plugin :whitelist_security
     set_allowed_columns :title, :description, :image_url, :is_private
     plugin :timestamps, update_on_create: true
-    plugin :association_dependencies, song: :nullify
+    plugin :association_dependencies, song: :nullify, shared_accounts: :nullify
 
     # Secure getters and setters
     def image_url
@@ -40,7 +44,8 @@ module MusicShare
       summary.merge(
         relationships: {
           owner: account,
-          songs: song
+          songs: song,
+          shared_accounts: shared_accounts
         }
       )
     end

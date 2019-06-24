@@ -10,7 +10,8 @@ module MusicShare
     end
 
     def can_view?
-      can_read? && (playlist_is_public? || account_is_creator?)
+      can_read? && (playlist_is_public? || account_is_creator? ||
+                    account_is_shared_account?)
     end
 
     def can_edit?
@@ -29,13 +30,29 @@ module MusicShare
       can_write? && account_is_creator?
     end
 
+    def can_export?
+      can_read? && (playlist_is_public? || account_is_creator? ||
+                    account_is_shared_account?)
+    end
+
+    def can_add_shared_accounts?
+      account_is_creator?
+    end
+
+    def can_be_shared_account?
+      !(account_is_creator? || account_is_shared_account?)
+    end
+
     def summary
       {
         can_view: can_view?,
         can_edit: can_edit?,
         can_delete: can_delete?,
         can_add_songs_to_playlist: can_add_songs_to_playlist?,
-        can_delete_songs_from_playlist: can_delete_songs_from_playlist?
+        can_delete_songs_from_playlist: can_delete_songs_from_playlist?,
+        can_export: can_export?,
+        can_add_shared_accounts: can_add_shared_accounts?,
+        can_be_shared_account: can_be_shared_account?
       }
     end
 
@@ -47,6 +64,10 @@ module MusicShare
 
     def account_is_creator?
       @playlist.account == @account
+    end
+
+    def account_is_shared_account?
+      @playlist.shared_accounts.include?(@account)
     end
 
     def can_read?

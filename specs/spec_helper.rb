@@ -2,6 +2,8 @@
 
 ENV['RACK_ENV'] = 'test'
 
+require 'simplecov'
+SimpleCov.start
 require 'minitest/autorun'
 require 'minitest/rg'
 require 'yaml'
@@ -10,6 +12,7 @@ require_relative 'test_load_all'
 
 def wipe_database
   wipe_playlists_songs
+  app.DB[:account_sp_tokens].delete
   app.DB[:accounts].delete
 end
 

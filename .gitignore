@@ -53,3 +53,6 @@ build-iPhoneSimulator/
 /app/db/store/*
 /config/secrets.yml
 .bundle/
+
+coverage/*
+!coverage/.resultset.json
