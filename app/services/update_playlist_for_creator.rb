@@ -34,7 +34,7 @@ module MusicShare
       playlist.update(title: playlist_data['title'] || '',
                       description: playlist_data['description'] || '',
                       image_url: playlist_data['image_url'] || '',
-                      is_private: playlist_data['is_private'] || true)
+                      is_private: playlist_data['is_private'])
     end
   end
 end
