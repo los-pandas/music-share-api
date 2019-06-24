@@ -10,6 +10,7 @@ module MusicShare
         @created = created_playlists
         @public = public_playlists
         @full_scope = all_playlists
+        @shared_with_account = playlists_shared_with_account
       end
 
       def viewable
@@ -22,6 +23,10 @@ module MusicShare
         @created
       end
 
+      def shared
+        @shared_with_account
+      end
+
       private
 
       def all_playlists
@@ -30,6 +35,10 @@ module MusicShare
 
       def created_playlists
         @current_account.playlists
+      end
+
+      def playlists_shared_with_account
+        @current_account.shared_playlists
       end
 
       def public_playlists

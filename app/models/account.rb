@@ -8,10 +8,17 @@ module MusicShare
   # Models a registered account
   class Account < Sequel::Model
     one_to_many :playlists
-    plugin :association_dependencies, playlists: :destroy
 
     one_to_one :account_sp_token, class: :'MusicShare::AccountSPToken'
-    plugin :association_dependencies, account_sp_token: :destroy
+
+    many_to_many :shared_playlists,
+                 class: :'MusicShare::Playlist',
+                 join_table: :accounts_playlists,
+                 left_key: :account_shared_id, right_key: :playlist_id
+
+    plugin :association_dependencies, playlists: :destroy,
+                                      account_sp_token: :destroy,
+                                      shared_playlists: :nullify
 
     plugin :whitelist_security
     set_allowed_columns :username, :email, :password, :account_sp_token,
