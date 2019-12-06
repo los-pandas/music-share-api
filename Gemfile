@@ -5,7 +5,7 @@ ruby '2.6.0'
 
 # Web API
 gem 'json'
-gem 'puma', '~>3.11'
+gem 'puma', '~>3.12'
 gem 'roda', '~>3.6'
 
 # Configuration
